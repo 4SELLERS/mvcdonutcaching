@@ -217,6 +217,11 @@ namespace DevTrends.MvcDonutCaching
                     DonutHoleFiller.RemoveDonutHoleWrappers(cacheItem.Content, filterContext, CacheSettings.Options)
                 );
 
+                // Skip saving the cache if ignored for current execution
+                if (OutputCacheManager.GetIgnoreCurrentExecution(filterContext)) {
+                    return; // Skip current execution from cache
+                }
+
                 if (CacheSettings.IsServerCachingEnabled && filterContext.HttpContext.Response.StatusCode == 200)
                 {
                     OutputCacheManager.AddItem(cacheKey, cacheItem, DateTime.UtcNow.AddSeconds(CacheSettings.Duration));
