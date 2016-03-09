@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web.Mvc;
 
 namespace DevTrends.MvcDonutCaching
 {
@@ -18,5 +19,18 @@ namespace DevTrends.MvcDonutCaching
         /// <param name="key">The key.</param>
         /// <returns>A <see cref="CacheItem"/> instance on cache hit, null otherwise.</returns>
         CacheItem GetItem(string key);
+
+        /// <summary>
+        /// Ignore the result of current execution from cache
+        /// </summary>
+        /// <param name="context">The conteroller context</param>
+        void IgnoreCurrentExecution(ControllerContext context);
+
+        /// <summary>
+        /// Check if the current execution should be ignore for caching
+        /// </summary>
+        /// <param name="context">The conteroller context</param>
+        /// <returns>True if current execution should be ignored for caching</returns>
+        bool GetIgnoreCurrentExecution(ControllerContext context);
     }
 }
