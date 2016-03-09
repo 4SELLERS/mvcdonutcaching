@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Caching;
+using System.Web.Mvc;
 using System.Web.Routing;
 using DevTrends.MvcDonutCaching.Annotations;
 
@@ -9,6 +10,8 @@ namespace DevTrends.MvcDonutCaching
 {
     public class OutputCacheManager : IReadWriteOutputCacheManager
     {
+        private const string KeyIgnoreCacheStore = "OutputCacheManager.KeyIgnoreCacheStore";
+
         private readonly OutputCacheProvider _outputCacheProvider;
         private readonly IKeyBuilder _keyBuilder;
 
@@ -150,6 +153,23 @@ namespace DevTrends.MvcDonutCaching
             {
                 _outputCacheProvider.Remove(keyToDelete);
             }
+        }
+
+        /// <summary>
+        /// Ignore the result of current execution from cache
+        /// </summary>
+        /// <param name="context">The conteroller context</param>
+        public void IgnoreCurrentExecution(ControllerContext context) {
+            context.HttpContext.Items[KeyIgnoreCacheStore] = true;
+        }
+
+        /// <summary>
+        /// Check if the current execution should be ignore for caching
+        /// </summary>
+        /// <param name="context">The conteroller context</param>
+        /// <returns>True if current execution should be ignored for caching</returns>
+        public bool GetIgnoreCurrentExecution(ControllerContext context) {
+            return context.HttpContext.Items[KeyIgnoreCacheStore] as bool? ?? false;
         }
     }
 }
