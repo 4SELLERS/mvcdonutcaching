@@ -156,7 +156,7 @@ namespace DevTrends.MvcDonutCaching
         }
 
         /// <summary>
-        /// Ignore the result of current execution from cache
+        /// Ignore the result of current execution and all child actions from cache
         /// </summary>
         /// <param name="context">The conteroller context</param>
         public void IgnoreCurrentExecution(ControllerContext context) {
@@ -170,6 +170,14 @@ namespace DevTrends.MvcDonutCaching
         /// <returns>True if current execution should be ignored for caching</returns>
         public bool GetIgnoreCurrentExecution(ControllerContext context) {
             return context.HttpContext.Items[KeyIgnoreCacheStore] as bool? ?? false;
+        }
+
+        /// <summary>
+        /// Clear the ignore flags for current execution
+        /// </summary>
+        /// <param name="context">The conteroller context</param>
+        public void  RemoveIgnoreCurrentExecution(ControllerContext context) {
+            context.HttpContext.Items.Remove(KeyIgnoreCacheStore);
         }
     }
 }

@@ -219,6 +219,7 @@ namespace DevTrends.MvcDonutCaching
 
                 // Skip saving the cache if ignored for current execution
                 if (OutputCacheManager.GetIgnoreCurrentExecution(filterContext)) {
+                    OutputCacheManager.RemoveIgnoreCurrentExecution(filterContext);
                     return; // Skip current execution from cache
                 }
 
