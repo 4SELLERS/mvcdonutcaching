@@ -31,13 +31,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release.Public|AnyCPU' ">
-    <OutputPath>..\nuget\lib\net40\</OutputPath>
+    <OutputPath>..\nuget\lib\net45\</OutputPath>
     <DefineConstants>TRACE;RELEASE_PUBLIC</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
-    <DocumentationFile>..\nuget\lib\net40\DevTrends.MvcDonutCaching.XML</DocumentationFile>
+    <DocumentationFile>..\nuget\lib\net45\DevTrends.MvcDonutCaching.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'CI|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
