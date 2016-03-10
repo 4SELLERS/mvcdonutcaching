@@ -32,5 +32,11 @@ namespace DevTrends.MvcDonutCaching
         /// <param name="context">The conteroller context</param>
         /// <returns>True if current execution should be ignored for caching</returns>
         bool GetIgnoreCurrentExecution(ControllerContext context);
+
+        /// <summary>
+        /// Clear the ignore flags for current execution
+        /// </summary>
+        /// <param name="context">The conteroller context</param>
+        void RemoveIgnoreCurrentExecution(ControllerContext context);
     }
 }
