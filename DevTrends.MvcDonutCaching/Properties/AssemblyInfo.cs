@@ -11,9 +11,9 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
 [assembly: Guid("ebcc3291-f04a-4511-b7eb-ddf57a74ada9")]
-[assembly: AssemblyVersion("1.3.1")]
-[assembly: AssemblyFileVersion("1.3.1")]
+[assembly: AssemblyVersion("1.3.2")]
+[assembly: AssemblyFileVersion("1.3.2")]
 
 #if RELEASE_PUBLIC
-    [assembly: AssemblyKeyFile(@"C:\Redwood.snk")]
+[assembly: AssemblyKeyFile(@"C:\Redwood.snk")]
 #endif

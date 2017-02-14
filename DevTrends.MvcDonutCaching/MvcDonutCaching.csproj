@@ -74,6 +74,7 @@
     <Compile Include="CacheItem.cs" />
     <Compile Include="CacheSettings.cs" />
     <Compile Include="CacheSettingsManager.cs" />
+    <Compile Include="DonutContentResult.cs" />
     <Compile Include="EncryptingActionSettingsSerialiser.cs" />
     <Compile Include="Encryptor.cs" />
     <Compile Include="Interfaces\ICacheHeadersHelper.cs" />

@@ -170,7 +170,7 @@ namespace DevTrends.MvcDonutCaching
                 {
                     // We inject the previous result into the MVC pipeline
                     // The MVC action won't execute as we injected the previous cached result.
-                    filterContext.Result = new ContentResult
+                    filterContext.Result = new DonutContentResult
                     {
                         Content = DonutHoleFiller.ReplaceDonutHoleContent(cachedItem.Content, filterContext, CacheSettings.Options),
                         ContentType = cachedItem.ContentType
