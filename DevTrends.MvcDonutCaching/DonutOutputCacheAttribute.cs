@@ -168,11 +168,11 @@ namespace DevTrends.MvcDonutCaching
                 // We have a cached version on the server side
                 if (cachedItem != null)
                 {
-                    // We inject the previous result into the MVC pipeline
+                                        // We inject the previous result into the MVC pipeline
                     // The MVC action won't execute as we injected the previous cached result.
                     filterContext.Result = new DonutContentResult
                     {
-                        Content = DonutHoleFiller.ReplaceDonutHoleContent(cachedItem.Content, filterContext, CacheSettings.Options),
+                        Content = DonutHoleFiller.ReplaceDonutHoleContent(cachedItem.Content, cachedItem.ContentType, filterContext, CacheSettings.Options),
                         ContentType = cachedItem.ContentType
                     };
                 }

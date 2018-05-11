@@ -35,7 +35,11 @@ namespace DevTrends.MvcDonutCaching
             return DonutHoles.Replace(content, match => match.Groups[2].Value);
         }
 
-        public string ReplaceDonutHoleContent(string content, ControllerContext filterContext, OutputCacheOptions options)
+        public string ReplaceDonutHoleContent(string content, ControllerContext filterContext, OutputCacheOptions options) {
+            return ReplaceDonutHoleContent(content, null, filterContext, options);
+        }
+
+        public string ReplaceDonutHoleContent(string content, string contentType, ControllerContext filterContext, OutputCacheOptions options)
         {
             if (
                 filterContext.IsChildAction &&
@@ -48,12 +52,27 @@ namespace DevTrends.MvcDonutCaching
             {
                 var actionSettings = _actionSettingsSerialiser.Deserialise(match.Groups[1].Value);
 
-                return InvokeAction(
+                var actionResultString = InvokeAction(
                     filterContext.Controller,
                     actionSettings.ActionName,
                     actionSettings.ControllerName,
                     actionSettings.RouteValues
                 );
+
+                // escape the string, so the parent's json is not broken
+                // notice: rendering json objects with donut caching inside a json object is not supported!
+                if (contentType != null && contentType.Equals("application/json", StringComparison.InvariantCultureIgnoreCase)) {
+                    var escaped = System.Web.Helpers.Json.Encode(actionResultString);
+                    
+                    if (string.IsNullOrEmpty(escaped)) {
+                        return escaped;
+                    }
+
+                    // the escaped string is wrapped in quotes
+                    return escaped.Substring(1, escaped.Length - 2);
+                }
+
+                return actionResultString;
             });
         }
 
