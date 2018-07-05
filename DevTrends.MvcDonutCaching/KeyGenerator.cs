@@ -67,9 +67,9 @@ namespace DevTrends.MvcDonutCaching
 
             // remove controller, action and DictionaryValueProvider which is added by the framework for child actions
             var filteredRouteData = routeData.Values.Where(
-                x => x.Key.ToLowerInvariant() != RouteDataKeyController && 
-                     x.Key.ToLowerInvariant() != RouteDataKeyAction &&   
-                     x.Key.ToLowerInvariant() != DataTokensKeyArea &&
+                x => !string.Equals(x.Key, RouteDataKeyController, StringComparison.OrdinalIgnoreCase) && 
+                     !string.Equals(x.Key, RouteDataKeyAction, StringComparison.OrdinalIgnoreCase) &&   
+                     !string.Equals(x.Key, DataTokensKeyArea, StringComparison.OrdinalIgnoreCase) &&
                      !(x.Value is DictionaryValueProvider<object>)
             ).ToList();
 
@@ -78,7 +78,7 @@ namespace DevTrends.MvcDonutCaching
                 filteredRouteData.Add(new KeyValuePair<string, object>(DataTokensKeyArea, areaName));
             }
 
-            var routeValues = new RouteValueDictionary(filteredRouteData.ToDictionary(x => x.Key.ToLowerInvariant(), x => x.Value));
+            var routeValues = new RouteValueDictionary(filteredRouteData.ToDictionary(x => x.Key, x => x.Value));
 
             if (!context.IsChildAction)
             {
@@ -88,18 +88,13 @@ namespace DevTrends.MvcDonutCaching
                 {
                     foreach (var formKey in context.HttpContext.Request.Form.AllKeys)
                     {
-                        if (routeValues.ContainsKey(formKey.ToLowerInvariant()))
+                        if (routeValues.ContainsKey(formKey))
                         {
                             continue;
                         }
 
                         var item = context.HttpContext.Request.Form[formKey];
-                        routeValues.Add(
-                            formKey.ToLowerInvariant(),
-                            item != null 
-                                ? item.ToLowerInvariant() 
-                                : string.Empty
-                        );
+                        routeValues.Add(formKey, item ?? string.Empty);
                     }
                 }
 
@@ -108,45 +103,65 @@ namespace DevTrends.MvcDonutCaching
                     foreach (var queryStringKey in context.HttpContext.Request.QueryString.AllKeys)
                     {
                         // queryStringKey is null if url has qs name without value. e.g. test.com?q
-                        if (queryStringKey == null || routeValues.ContainsKey(queryStringKey.ToLowerInvariant()))
+                        if (queryStringKey == null || routeValues.ContainsKey(queryStringKey))
                         {
                             continue;
                         }
 
                         var item = context.HttpContext.Request.QueryString[queryStringKey];
-                        routeValues.Add(
-                            queryStringKey.ToLowerInvariant(),
-                            item != null 
-                                ? item.ToLowerInvariant() 
-                                : string.Empty
-                        );
+                        routeValues.Add(queryStringKey, item ?? string.Empty);
                     }
                 }
             }
 
             if (!string.IsNullOrEmpty(cacheSettings.VaryByParam))
             {
-                if (cacheSettings.VaryByParam.ToLowerInvariant() == "none")
+                if (string.Equals(cacheSettings.VaryByParam, "none", StringComparison.OrdinalIgnoreCase))
                 {
                     routeValues.Clear();
                 }
                 else if (cacheSettings.VaryByParam != "*")
                 {
-                    var parameters = cacheSettings.VaryByParam.ToLowerInvariant().Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                    routeValues = new RouteValueDictionary(routeValues.Where(x => parameters.Contains(x.Key)).ToDictionary(x => x.Key, x => x.Value));
+                    var parameters = SplitValues(cacheSettings.VaryByParam)
+                        .Join(routeValues, p => p, rv => rv.Key, (p, rv) => rv, StringComparer.OrdinalIgnoreCase)
+                        .ToDictionary(x => x.Key, x => x.Value);
+                    
+                    routeValues = new RouteValueDictionary(parameters);
                 }
             }
 
             if (!string.IsNullOrEmpty(cacheSettings.VaryByCustom))
             {
                 // If there is an existing route value with the same key as varybycustom, we should overwrite it
-                routeValues[cacheSettings.VaryByCustom.ToLowerInvariant()] =
-                            context.HttpContext.ApplicationInstance.GetVaryByCustomString(HttpContext.Current, cacheSettings.VaryByCustom);
+                routeValues[cacheSettings.VaryByCustom] = context.HttpContext.ApplicationInstance.GetVaryByCustomString(HttpContext.Current, cacheSettings.VaryByCustom);
+            }
+
+            if (!string.IsNullOrEmpty(cacheSettings.VaryByHeader) && !string.Equals(cacheSettings.VaryByHeader, "none", StringComparison.OrdinalIgnoreCase)) 
+            {
+                var headers = context.HttpContext.Request.Headers;
+                var headersToVaryBy = cacheSettings.VaryByHeader == "*"
+                    ? headers.AllKeys
+                    : SplitValues(cacheSettings.VaryByHeader);
+
+                var headersForCaching = headers.AllKeys
+                    .Select(k => new KeyValuePair<string, object>(k, headers.Get(k)))
+                    .Join(headersToVaryBy, kv => kv.Key, h => h, (kv, h) => kv, StringComparer.OrdinalIgnoreCase);
+                
+                foreach (var header in headersForCaching) 
+                {
+                    routeValues[header.Key] = header.Value ?? string.Empty;
+                }                
             }
 
             var key = _keyBuilder.BuildKey(controllerName, actionName, routeValues);
 
             return key;
         }
+
+        private static string[] SplitValues(string value) 
+        {
+            return value?.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries);
+        }
+
     }
 }

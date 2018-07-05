@@ -78,6 +78,14 @@ namespace DevTrends.MvcDonutCaching
         }
 
         /// <summary>
+        /// Gets or sets the VaryByHeader cache parameter.
+        /// </summary>
+        /// <value>
+        /// The VaryByHeader cache parameter.
+        /// </value>
+        public string VaryByHeader { get; set; }
+
+        /// <summary>
         /// Gets or sets the cache profile name.
         /// </summary>
         public string CacheProfile
@@ -168,7 +176,7 @@ namespace DevTrends.MvcDonutCaching
                 // We have a cached version on the server side
                 if (cachedItem != null)
                 {
-                                        // We inject the previous result into the MVC pipeline
+                    // We inject the previous result into the MVC pipeline
                     // The MVC action won't execute as we injected the previous cached result.
                     filterContext.Result = new DonutContentResult
                     {
@@ -271,6 +279,7 @@ namespace DevTrends.MvcDonutCaching
                     Duration = Duration,
                     VaryByCustom = VaryByCustom,
                     VaryByParam = VaryByParam,
+                    VaryByHeader = VaryByHeader,
                     Location = (int)Location == -1 ? OutputCacheLocation.Server : Location,
                     NoStore = NoStore,
                     Options = Options,
@@ -286,6 +295,7 @@ namespace DevTrends.MvcDonutCaching
                     Duration = Duration == -1 ? cacheProfile.Duration : Duration,
                     VaryByCustom = VaryByCustom ?? cacheProfile.VaryByCustom,
                     VaryByParam = VaryByParam ?? cacheProfile.VaryByParam,
+                    VaryByHeader = VaryByHeader ?? cacheProfile.VaryByHeader,
                     Location = (int)Location == -1 ? ((int)cacheProfile.Location == -1 ? OutputCacheLocation.Server : cacheProfile.Location) : Location,
                     NoStore = _noStore.HasValue ? _noStore.Value : cacheProfile.NoStore,
                     Options = Options,
